@@ -1,11 +1,11 @@
-import pickle
 import pandas as pd 
+import pickle
+from flask import Flask, render_template, request
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-from flask import Flask, render_template, request
 
 
-app=Flask(__name__)
+app=Flask(__name__,  static_folder='static')
 model = pickle.load(open('model.pkl', 'rb'))
 trip = pd.read_csv('tripadvisor_hotel_reviews.csv')
 tokenizer = Tokenizer()
@@ -23,23 +23,24 @@ def home():
 @app.route('/predict', methods=['POST', 'GET'])
 def predict():
     comment = request.form['comment']
-    
+
     # Tokenization
     comment = tokenizer.texts_to_sequences(comment)
-    
+
     # padding
     comment = pad_sequences(comment,maxlen=100,padding='post')
-    
+
     # prediction
-    review_predict = (model.predict(comment)>0.4).astype('int')
-    
+    review_predict = (model.predict(comment)>0.5).astype('int')
+
     if review_predict[0] == 1:
         result = "It's a negative review"
+        audio_file = '0.mp3'
     else:
         result = "It's a positive review"
+        audio_file = '1.mp3'
 
-
-    return render_template('index.html', **locals())
+    return render_template('index.html', audio_file=audio_file)
 
 if __name__ == '__main__':
     app.run()
