@@ -8,7 +8,11 @@
 
                 Write comment: <br>
                 <textarea id="comment" name="comment" rows="10" cols="50"></textarea>  <br><br>
-				
+
+		<audio autoplay>
+		  <source src={{ url_for('static', filename=audio_file) }}>
+		</audio>
+		    
                 Result: {{result}} <br><br>
 					
 
